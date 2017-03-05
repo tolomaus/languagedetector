@@ -17,7 +17,7 @@ import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.language.experimental.macros
 
 object Utils {
-  private val logger = LoggerFactory.getLogger(this.getClass)
+  private lazy val logger = LoggerFactory.getLogger(this.getClass)
   private val cf: Config = ConfigFactory.load("local").withFallback(ConfigFactory.load())
 
   def getFiltersFromCLI(args: Array[String]): Scallop = {
@@ -70,7 +70,7 @@ object Utils {
     sparkSession.sparkContext.setJobDescription(s"Load parquet file - $path (meta data only)")
     sparkSession.read.load(s"$getParquetRoot/$path")
   }
-  
+
   def saveAsParquetFile[T](ds: Dataset[T], path: String): Unit = {
     ds.write.mode(SaveMode.Overwrite).save(s"$getParquetRoot/$path")
   }
@@ -137,6 +137,16 @@ object Utils {
     to.toList match {
       case x :: xs => Some(x :: xs)
       case Nil => None
+    }
+  }
+
+  def setBusLogFileNamePropertyIfEmpty(): Unit = {
+    if(System.getProperty("businessLogFileName") == null) {
+      val jarDir = new File(this.getClass.getProtectionDomain.getCodeSource.getLocation.getPath).getParent
+      val date = new SimpleDateFormat("yyyyMMddHHmm").format(Calendar.getInstance().getTime)
+      val busLogFileName = s"$jarDir/logs/businessLog_$date.log"
+
+      System.setProperty("businessLogFileName", busLogFileName)
     }
   }
 

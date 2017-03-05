@@ -11,7 +11,11 @@ import org.rogach.scallop.Scallop
 import org.slf4j.{Logger, LoggerFactory}
 
 trait Module {
-  protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  protected val logger: Logger = {
+    Utils.setBusLogFileNamePropertyIfEmpty()
+    LoggerFactory.getLogger(this.getClass)
+  }
+
   protected implicit val module: Class[_ <: Module] = this.getClass
 
   def main(args: Array[String]): Unit = {
