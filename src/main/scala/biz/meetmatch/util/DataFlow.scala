@@ -10,13 +10,16 @@ import org.apache.commons.io.FileUtils
 import org.reflections.Reflections
 import org.reflections.scanners.{MemberUsageScanner, MethodParameterNamesScanner, MethodParameterScanner, SubTypesScanner}
 import org.reflections.util.{ClasspathHelper, ConfigurationBuilder}
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 object DataFlow {
-  private val logger = LoggerFactory.getLogger(this.getClass)
+  private val logger: Logger = {
+    Utils.setBusLogFileNamePropertyIfEmpty()
+    LoggerFactory.getLogger(this.getClass)
+  }
 
   val modulesPkg = "biz.meetmatch.modules"
   val reflections = new Reflections(
